@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>로딩 중...</title>
+    <meta http-equiv="refresh" content="5;url=/main" />
+    <!-- 5초 후 메인 페이지로 리디렉션 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      function updateProgress() {
+        let progress = 0;
+        const progressBar = document.getElementById("progress-bar");
+        const interval = setInterval(() => {
+          progress += 1;
+          progressBar.style.width = progress + "%";
+          document.getElementById("progress-text").innerText =
+            progress + "% 완료";
+          if (progress >= 100) {
+            clearInterval(interval);
+          }
+        }, 50); // 5초 동안 게이지 100% 채우기
+      }
+
+      window.onload = updateProgress;
+    </script>
+  </head>
+  <body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="text-center">
+      <h1 class="text-2xl font-bold mb-4">로딩 중입니다...</h1>
+      <div class="w-full bg-gray-300 rounded-full h-6">
+        <div
+          id="progress-bar"
+          class="bg-blue-500 h-6 rounded-full"
+          style="width: 0%"
+        ></div>
+        <!-- 퍼센트 바 -->
+      </div>
+      <p id="progress-text" class="mt-2 text-gray-700">0% 완료</p>
+      <!-- 퍼센트 텍스트 -->
+    </div>
+  </body>
+</html>
