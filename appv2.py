@@ -5,8 +5,6 @@ import random
 import streamlit as st
 import matplotlib.pyplot as plt
 
-
-
 # 세션 상태 초기화
 if 'step' not in st.session_state:
     st.session_state.step = 0  # 로딩 페이지를 0단계로 설정
@@ -24,6 +22,10 @@ if 'sliders_moved' not in st.session_state:
     st.session_state.sliders_moved = [False] * 4
 if 'loading_complete' not in st.session_state:
     st.session_state.loading_complete = False  # 로딩 완료 여부
+if 'level' not in st.session_state:
+    st.session_state.level = 1  # 현재 레벨
+if 'xp_to_next_level' not in st.session_state:
+    st.session_state.xp_to_next_level = 100  # 다음 레벨까지 필요한 경험치
 
 def reset_app():
     st.session_state.step = 0  # 로딩 페이지로 돌아감
@@ -34,8 +36,11 @@ def reset_app():
     st.session_state.reset = True
     st.session_state.sliders_moved = [False] * 4
     st.session_state.loading_complete = False
+    st.session_state.level = 1
+    st.session_state.xp_to_next_level = 100
 
 def loading_page():
+    st.title("기록하는 행복한 습관, UPGRADE")
     st.header("환영합니다! 잠시만 기다려주세요...")
     
     positive_messages = [
@@ -64,7 +69,6 @@ def loading_page():
     time.sleep(1)
     st.session_state.loading_complete = True
     st.session_state.step += 1  # 다음 단계로 이동
-    # st.experimental_rerun()
     st.rerun()
 
 def task_input_step():
@@ -107,7 +111,7 @@ def task_input_step():
 
 def eisenhower_step():
     st.header("📝 아이젠하워(Eisenhower) 매트릭스 평가")
-    st.write("각 할 일에 대해 중요도(Importance)와 긴급도(emergency)를 실수 값으로 평가해주세요.")
+    st.write("각 할 일에 대해 중요도(Importance)와 긴급도(Urgency)를 실수 값으로 평가해주세요.")
 
     total_tasks = len(st.session_state.tasks)
     evaluated_count = len(st.session_state.evaluated_tasks)
@@ -175,7 +179,6 @@ def eisenhower_step():
         if col1.button("이전 평가로"):
             st.session_state.evaluated_tasks.pop()
             st.session_state.sliders_moved[idx] = False
-            # st.experimental_rerun()
             st.rerun()
 
     # "다음 평가로" 버튼 비활성화 조건 (마지막 평가 시 비활성화)
@@ -185,7 +188,6 @@ def eisenhower_step():
         if col2.button("다음 평가로", key=f"next_evaluation_{idx}"):
             st.session_state.evaluated_tasks.append((task, urgency_score, importance_score))
             st.session_state.sliders_moved[idx] = True
-            # st.experimental_rerun()
             st.rerun()
 
     # 평가가 완료되기 전까지 버튼 비활성화
@@ -196,7 +198,6 @@ def eisenhower_step():
         # 평가가 완료된 경우 버튼 활성화
         if col1.button("다시 평가하기"):
             st.session_state.step = 2 
-            # st.experimental_rerun()
             st.rerun()
 
         if col2.button("평가 완료"):
@@ -308,14 +309,21 @@ def todo_step():
             # 상단 프로그레스바를 가득 채우기
             st.session_state.step = 3  # 단계 값 3으로 설정
             st.progress(1.0)  # 상단 프로그레스바 가득 채우기
+    time.sleep(0.5)
+    # 경험치 및 레벨 계산
+    xp_to_next_level = st.session_state.xp_to_next_level
+    current_xp = st.session_state.xp
+    current_level = st.session_state.level
 
-    # 현재 경험치 표시
-    st.write(f"현재 경험치: **{st.session_state.xp} XP**")
+    if current_xp >= xp_to_next_level:
+        st.session_state.level += 1
+        st.session_state.xp_to_next_level += 100  # 다음 레벨까지 필요한 경험치 증가
+        st.success(f"레벨업! 현재 레벨: {st.session_state.level}")
 
-    # 경험치에 따른 보상 예시
-    if st.session_state.xp >= 200:
-        st.balloons()
-        st.success("축하합니다! '시간 관리 마스터' 뱃지를 획득하셨습니다.")
+    percent_to_next_level = (current_xp / xp_to_next_level) * 100
+
+    st.write(f"**현재 레벨: {current_level}**")
+    st.write(f"**다음 레벨까지: {percent_to_next_level:.2f}%** ({current_xp}/{xp_to_next_level} XP)")
 
     # 초기화 버튼
     st.button("초기화", on_click=reset_app)
