@@ -1,12 +1,15 @@
 import streamlit as st
-
+import time
+import random
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+
+# 폰트 설정 (필요 시 제거하거나 수정)
 plt.rcParams['font.family'] = 'AppleGothic'
 
 # 세션 상태 초기화
 if 'step' not in st.session_state:
-    st.session_state.step = 1
+    st.session_state.step = 0  # 로딩 페이지를 0단계로 설정
 if 'tasks' not in st.session_state:
     st.session_state.tasks = []
 if 'evaluated_tasks' not in st.session_state:
@@ -19,15 +22,49 @@ if 'reset' not in st.session_state:
     st.session_state.reset = False
 if 'sliders_moved' not in st.session_state:
     st.session_state.sliders_moved = [False] * 4
+if 'loading_complete' not in st.session_state:
+    st.session_state.loading_complete = False  # 로딩 완료 여부
 
 def reset_app():
-    st.session_state.step = 1
+    st.session_state.step = 0  # 로딩 페이지로 돌아감
     st.session_state.tasks = []
     st.session_state.evaluated_tasks = []
     st.session_state.completed_tasks = []
     st.session_state.xp = 0
     st.session_state.reset = True
     st.session_state.sliders_moved = [False] * 4
+    st.session_state.loading_complete = False
+
+def loading_page():
+    st.header("환영합니다! 잠시만 기다려주세요...")
+    
+    positive_messages = [
+        "오늘의 기록은 나를 더 성장시켜요",
+        "어제보다 더 나은 오늘",
+        "작은 노력들이 큰 변화를 만듭니다",
+        "지금 이 순간이 가장 소중해요",
+        "포기하지 마세요, 당신은 할 수 있어요",
+        "한 걸음씩 앞으로 나아가요",
+        "긍정적인 생각은 긍정적인 결과를 가져옵니다",
+        "당신의 노력이 빛을 발할 거예요",
+        "꿈을 향해 달려가세요",
+        "매일매일 새로운 시작입니다"
+    ]
+    
+    progress_bar = st.progress(0)
+    message_placeholder = st.empty()
+    
+    for i in range(101):
+        time.sleep(0.03)  # 로딩 속도 조절 가능
+        progress_bar.progress(i)
+        if i % 20 == 0:
+            message = random.choice(positive_messages)
+            message_placeholder.write(f"**{message}**")
+    st.success("업그레이드 시작!")
+    time.sleep(1)
+    st.session_state.loading_complete = True
+    st.session_state.step += 1  # 다음 단계로 이동
+    st.experimental_rerun()
 
 def task_input_step():
     st.header("📝 할 일 입력")
@@ -66,7 +103,6 @@ def task_input_step():
                 return
         st.session_state.step += 1
         st.session_state.reset = False
-
 
 def eisenhower_step():
     st.header("📝 아이젠하워 매트릭스 평가")
@@ -265,6 +301,10 @@ def todo_step():
             st.success(f"풍선 경험치 {st.session_state.xp}점을 획득했습니다!")
             st.session_state.total_balloons = 0  # 풍선 게이지 리셋
 
+            # 상단 프로그레스바를 가득 채우기
+            st.session_state.step = 3  # 단계 값 3으로 설정
+            st.progress(1.0)  # 상단 프로그레스바 가득 채우기
+
     # 현재 경험치 표시
     st.write(f"현재 경험치: **{st.session_state.xp} XP**")
 
@@ -277,18 +317,21 @@ def todo_step():
     st.button("초기화", on_click=reset_app)
     
 def main():
-    total_steps = 3
+    total_steps = 3  # 로딩 페이지는 제외
     current_step = st.session_state.step
 
-    overall_progress = (current_step - 1) / total_steps
-    st.progress(overall_progress)
+    if current_step == 0:
+        loading_page()
+    else:
+        overall_progress = (current_step - 1) / total_steps
+        st.progress(overall_progress)
 
-    if st.session_state.step == 1:
-        task_input_step()
-    elif st.session_state.step == 2:
-        eisenhower_step()
-    elif st.session_state.step == 3:
-        todo_step()
+        if st.session_state.step == 1:
+            task_input_step()
+        elif st.session_state.step == 2:
+            eisenhower_step()
+        elif st.session_state.step == 3:
+            todo_step()
 
 if __name__ == "__main__":
     main()
