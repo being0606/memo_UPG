@@ -64,7 +64,8 @@ def loading_page():
     time.sleep(1)
     st.session_state.loading_complete = True
     st.session_state.step += 1  # 다음 단계로 이동
-    st.experimental_rerun()
+    # st.experimental_rerun()
+    st.rerun()
 
 def task_input_step():
     st.header("📝 할 일 입력")
@@ -174,7 +175,8 @@ def eisenhower_step():
         if col1.button("이전 평가로"):
             st.session_state.evaluated_tasks.pop()
             st.session_state.sliders_moved[idx] = False
-            st.experimental_rerun()
+            # st.experimental_rerun()
+            st.rerun()
 
     # "다음 평가로" 버튼 비활성화 조건 (마지막 평가 시 비활성화)
     if evaluated_count >= total_tasks:
@@ -183,7 +185,8 @@ def eisenhower_step():
         if col2.button("다음 평가로", key=f"next_evaluation_{idx}"):
             st.session_state.evaluated_tasks.append((task, urgency_score, importance_score))
             st.session_state.sliders_moved[idx] = True
-            st.experimental_rerun()
+            # st.experimental_rerun()
+            st.rerun()
 
     # 평가가 완료되기 전까지 버튼 비활성화
     if evaluated_count < total_tasks:
@@ -193,7 +196,8 @@ def eisenhower_step():
         # 평가가 완료된 경우 버튼 활성화
         if col1.button("다시 평가하기"):
             st.session_state.step = 2 
-            st.experimental_rerun()
+            # st.experimental_rerun()
+            st.rerun()
 
         if col2.button("평가 완료"):
             st.session_state.step += 1
