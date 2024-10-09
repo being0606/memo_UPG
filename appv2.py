@@ -1,14 +1,10 @@
 import os
-
 import time
 import random
 
 import streamlit as st
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
 
-plt.rcParams['font.family'] ='Malgun Gothic'
-plt.rcParams['axes.unicode_minus'] =False
 
 
 # 세션 상태 초기화
@@ -110,8 +106,8 @@ def task_input_step():
         st.session_state.reset = False
 
 def eisenhower_step():
-    st.header("📝 아이젠하워 매트릭스 평가")
-    st.write("각 할 일에 대해 중요도와 긴급도를 실수 값으로 평가해주세요.")
+    st.header("📝 아이젠하워(Eisenhower) 매트릭스 평가")
+    st.write("각 할 일에 대해 중요도(Importance)와 긴급도(emergency)를 실수 값으로 평가해주세요.")
 
     total_tasks = len(st.session_state.tasks)
     evaluated_count = len(st.session_state.evaluated_tasks)
@@ -119,11 +115,11 @@ def eisenhower_step():
     # 각 슬라이더의 현재 값을 저장할 리스트
     current_values = []
 
-    st.write("### 아이젠하워 매트릭스 시각화")
+    st.write("### Eisenhower Matrix Visualization")
     fig, ax = plt.subplots()
-    ax.set_xlabel("긴급도")
-    ax.set_ylabel("중요도")
-    ax.set_title("아이젠하워 매트릭스")
+    ax.set_xlabel("Importance")
+    ax.set_ylabel("Urgency")
+    ax.set_title("Eisenhower Matrix")
     ax.grid(True)
 
     # 축을 (0, 0)으로 설정하고, 각 점들을 사분면으로 배치
@@ -135,17 +131,17 @@ def eisenhower_step():
     # 평가된 할 일들 시각화 (중심을 0, 0으로 변경)
     for idx, (task, urgency_score, importance_score) in enumerate(st.session_state.evaluated_tasks):
         ax.scatter(urgency_score, importance_score, s=100)
-        ax.text(urgency_score + 0.1, importance_score, f'할 일 {idx+1}', fontsize=9)
+        ax.text(urgency_score + 0.1, importance_score, f'Task {idx+1}', fontsize=9)
 
     # 실시간 시각화 업데이트를 위해 선택한 슬라이더 값도 바로 시각화
     if evaluated_count < total_tasks:
         idx = evaluated_count
         task = st.session_state.tasks[idx]
-        st.write(f"**할 일 {idx+1}:** {task}")
+        st.write(f"**Task {idx+1}:** {task}")
 
         # 슬라이더로 중요도와 긴급도를 -2.0에서 2.0까지 실수 값으로 선택
         importance_score = st.slider(
-            "중요도를 선택하세요",
+            "중요도(Importance)를 선택하세요",
             min_value=-2.0,
             max_value=2.0,
             value=0.0,  # 기본값
@@ -154,7 +150,7 @@ def eisenhower_step():
         )
 
         urgency_score = st.slider(
-            "긴급도를 선택하세요",
+            "긴급도(Urgency)를 선택하세요",
             min_value=-2.0,
             max_value=2.0,
             value=0.0,  # 기본값
@@ -164,7 +160,7 @@ def eisenhower_step():
 
         # 슬라이더 값이 변경될 때마다 그래프에 실시간으로 반영
         ax.scatter(urgency_score, importance_score, s=150, color='red')
-        ax.text(urgency_score + 0.1, importance_score, f'현재 위치', fontsize=9, color='red')
+        ax.text(urgency_score + 0.1, importance_score, f'Pointer', fontsize=9, color='red')
 
     # 그래프 출력
     st.pyplot(fig)
