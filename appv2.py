@@ -1,11 +1,30 @@
-import streamlit as st
+import os
+
 import time
 import random
+
+import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 
-# 폰트 설정 (필요 시 제거하거나 수정)
-plt.rcParams['font.family'] = 'AppleGothic'
+# 한글 폰트 적용 함수
+@st.cache_data
+def fontRegistered():
+    # customFonts 폴더에 있는 폰트 파일을 불러오기
+    font_path = os.path.join(os.getcwd(), 'customFonts', 'NotoSansKR-VariableFont_wght.ttf')
+    
+    # 폰트를 매니저에 등록
+    fm.fontManager.addfont(font_path)
+    fm._load_fontmanager(try_read_cache=False)
+
+    # 폰트 파일 경로로부터 폰트 이름 추출
+    font_name = fm.FontProperties(fname=font_path).get_name()
+    
+    # matplotlib에 폰트 설정
+    plt.rc('font', family=font_name)
+    return font_name
+
+font_name = fontRegistered()
 
 # 세션 상태 초기화
 if 'step' not in st.session_state:
