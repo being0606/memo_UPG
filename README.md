@@ -75,3 +75,9 @@
 ## 라이선스
 
 이 프로젝트는 MIT 라이선스에 따라 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
+
+
+
+RF : https://www.surveylab.com/blog/system-usability-scale-sus/
+RF : https://www.wonju.go.kr/health/contents.do?key=1694
+RF : https://kut.dcollection.net/public_resource/pdf/200000375391_20241114143111.pdf
